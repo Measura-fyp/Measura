@@ -1,32 +1,38 @@
-const heights = [
-    { timestamp: '2025-01-12 08:00', height: 170 },
-    { timestamp: '2025-01-12 09:00', height: 172 },
-    // Tambahkan data lain di sini
-  ];
-  
-  // Fungsi untuk memaparkan data dalam jadual
-  function getData() {
-    const table = document.getElementById('heightsTable');
-    heights.forEach(height => {
-      let row = table.insertRow();
-      row.insertCell(0).innerHTML = height.timestamp;
-      row.insertCell(1).innerHTML = height.height;
-    });
+// Import supabase client
+const supabaseUrl = 'https://iwtsviyezonayhsxupsr.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml3dHN2aXllem9uYXloc3h1cHNyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY1NzkzNDMsImV4cCI6MjA1MjE1NTM0M30.dNXxYUjLXIdd8UnvmYuWhrAiEMCIwAnTawOesdZNInY';
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+// Function to fetch data from Supabase
+async function fetchData() {
+  let { data, error } = await supabase
+    .from('PENGUKURAN')
+    .select('*');
+
+  if (error) {
+    console.error('Error fetching data:', error);
+  } else {
+    console.log('Data fetched:', data);
+    displayData(data);
   }
-  
-  // Fungsi untuk muat turun data
-  function exportToCSV() {
-    let csvContent = "Timestamp,Height (cm)\n";
-    heights.forEach(height => {
-      csvContent += `${height.timestamp},${height.height}\n`;
-    });
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'heights.csv';
-    link.click();
-  }
-  
-  // Panggil fungsi getData untuk memaparkan data apabila halaman dimuat
-  getData();
-  
+}
+
+// Function to display data in HTML table
+function displayData(data) {
+  const tableBody = document.getElementById('data-table-body');
+  tableBody.innerHTML = '';
+
+  data.forEach((row) => {
+    const tableRow = `
+      <tr>
+        <td>${row.TARIKH}</td>
+        <td>${row.NAMA}</td>
+        <td>${row.KETINGGIAN}</td>
+      </tr>
+    `;
+    tableBody.innerHTML += tableRow;
+  });
+}
+
+// Call the fetchData function on page load
+fetchData();
